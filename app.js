@@ -13,10 +13,17 @@ const app = express();
 //adicionar bootstrap
 app.use('/bootstrap', express.static('./node_modules/bootstrap/dist'))
 
+//adicionar css
+app.use('/css',express.static('./css'));
+
 //configuração do express-handlebars
 app.engine('handlebars', engine());
 app.set('view engine','handlebars');
 app.set('views', './views');
+
+//Manipulação de dados via rotas
+app.use(express.json());
+app.use(express.urlencoded({extended:false}));
 
 // Configuração de conexão com o PostgreSQL
 const pool = new Pool({
@@ -32,7 +39,7 @@ app.get('/', async (req, res) => {
   try {
     // Exemplo de consulta
     const result = await pool.query('SELECT NOW()');
-    res.json(result.rows[0]);
+    res.render("formulario")
   } catch (error) {
     console.error('Erro na consulta ao PostgreSQL:', error);
     res.status(500).send('Erro interno do servidor');
@@ -47,9 +54,14 @@ app.listen(porta, () => {
 
 
 //Rota Principal
-app.get('/',function(req,res){
-   res.render('formulario');
-});
+app.get('/', function(req, res) {
+    res.render('formulario');
+  });
+
+  //Rota de cadastro
+  app.post('/cadastrar',function(req,res){
+      console.log(req.body);
+  });
 
 //Servidor
  app.listen(8080);
